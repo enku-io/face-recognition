@@ -13,6 +13,7 @@ import cv2
 import os
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+alignment = AlignDlib((os.path.join(ROOT, 'models/landmarks.dat')))
 
 def load_image(path):
     img = cv2.imread(path, 1)
@@ -40,13 +41,16 @@ def findCosineSimilarity(source_representation, test_representation):
     return 1 - (a / (np.sqrt(b) * np.sqrt(c)))
 
 if __name__ == '__main__':
+    print("inside predict")
     nn4_small2_pretrained = create_model()
     nn4_small2_pretrained.load_weights(os.path.join(ROOT, 'weights/nn4.small2.v1.h5'))
     alignment = AlignDlib((os.path.join(ROOT, 'models/landmarks.dat')))
-    img1 = load_image(os.path.join(ROOT,'images/enku1.png'))
-    img2 = load_image(os.path.join(ROOT,'images/pakistan.jpeg'))
+    img1 = load_image(os.path.join(ROOT,'images/beke.jpeg'))
+    img2 = load_image(os.path.join(ROOT,'images/test.jpeg'))
     img1 = align_image(img1)
     img2 = align_image(img2)
+    img1 = (img1 / 255.).astype(np.float32)
+    img2 = (img2 / 255.).astype(np.float32)
     embed1 = nn4_small2_pretrained.predict(np.expand_dims(img1, axis=0))[0]
     embed2 = nn4_small2_pretrained.predict(np.expand_dims(img2, axis=0))[0]
     print(distance(embed1,embed2))
